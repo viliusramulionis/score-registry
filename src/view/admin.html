@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Šlagerina — Admin</title>
+    <style>
+        body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial;margin:22px}
+        main {max-width:600px;margin:0 auto}
+        .controls{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+        .player-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+        input[type="text"]{padding:8px;border:1px solid #ccc;border-radius:6px}
+        button{padding:8px 10px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer}
+        ul.players{margin-top:12px;padding:0;list-style:none}
+
+        /* Player list item layout */
+        .player-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid #eee;border-radius:8px;margin-top:8px;background:#fbfbfc}
+        .player-meta{display:flex;align-items:center;gap:12px}
+        .player-name{font-weight:600}
+        .player-score{min-width:40px;text-align:center;background:#fff;border:1px solid #e6e6ea;padding:4px 8px;border-radius:6px}
+        .player-actions{display:flex;gap:8px}
+        .player-actions button{padding:6px 8px;font-size:13px}
+        .btn-deduct{background:#fff;border-color:#f1c0c0}
+        .btn-add{background:#fff;border-color:#c6f1c8}
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Admin — Players</h1>
+
+        <div class="controls">
+            <button id="addPlayerBtn" type="button">Add player</button>
+            <div id="inputs" aria-live="polite"></div>
+        </div>
+
+        <section>
+            <h2>Players</h2>
+            <ul id="playersList" class="players" aria-live="polite"></ul>
+        </section>
+    </main>
+    <script>
+        (function(){
+            const addBtn = document.getElementById('addPlayerBtn');
+            const inputs = document.getElementById('inputs');
+            const playersList = document.getElementById('playersList');
+            let playerCounter = 0;
+
+            fetch('/api/players')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                data.forEach(player => {
+                    addPlayer(player.id, player.name, player.points);
+                });
+            });
+
+            // Create a new input + submit button row
+            function createInputRow(){
+                const row = document.createElement('div');
+                row.className = 'player-row';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Player name';
+                input.setAttribute('aria-label','Player name');
+
+                const submit = document.createElement('button');
+                submit.type = 'button';
+                submit.textContent = 'Submit';
+
+                const cancel = document.createElement('button');
+                cancel.type = 'button';
+                cancel.textContent = 'Cancel';
+
+                // Submit handler
+                submit.addEventListener('click', ()=>{
+                    const name = input.value.trim();
+                    if(!name) {
+                        input.focus();
+                        return;
+                    }
+                    registerPlayer(name);
+                    // remove the input row after submit
+                    row.remove();
+                });
+
+                cancel.addEventListener('click', ()=>row.remove());
+
+                row.appendChild(input);
+                row.appendChild(submit);
+                row.appendChild(cancel);
+                inputs.appendChild(row);
+
+                input.focus();
+            }
+
+            function registerPlayer(name){
+                fetch('/api/add-players', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Player registered:', data);
+                    addPlayer(data.player.id, data.player.name);
+                })
+                .catch(error => {
+                    console.error('Error registering player:', error);
+                });
+            }
+
+            // Add player to the visible list with score and action buttons
+            function addPlayer(id, name, score = 0){
+                playerCounter += 1;
+                const playerId = 'player-' + playerCounter;
+
+                const li = document.createElement('li');
+                li.className = 'player-item';
+                li.id = playerId;
+                li.setAttribute('data-score', score);
+
+                const meta = document.createElement('div');
+                meta.className = 'player-meta';
+
+                const spanName = document.createElement('span');
+                spanName.className = 'player-name';
+                spanName.textContent = name;
+
+                const spanScore = document.createElement('span');
+                spanScore.className = 'player-score';
+                spanScore.setAttribute('aria-live','polite');
+                spanScore.textContent = score;
+
+                meta.appendChild(spanName);
+                meta.appendChild(spanScore);
+
+                const actions = document.createElement('div');
+                actions.className = 'player-actions';
+
+                const deduct = document.createElement('button');
+                deduct.type = 'button';
+                deduct.className = 'btn-deduct';
+                deduct.textContent = 'Deduct point';
+                deduct.addEventListener('click', ()=>updateScore(id, li, -1));
+
+                const add = document.createElement('button');
+                add.type = 'button';
+                add.className = 'btn-add';
+                add.textContent = 'Add point';
+                add.addEventListener('click', ()=>updateScore(id, li, +1));
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'btn-delete';
+                deleteBtn.textContent = 'Delete player';
+                deleteBtn.addEventListener('click', ()=>deletePlayer(id, li));
+
+                actions.appendChild(deduct);
+                actions.appendChild(add);
+                actions.appendChild(deleteBtn);
+
+                li.appendChild(meta);
+                li.appendChild(actions);
+                playersList.appendChild(li);
+            }
+
+            function updateScore(id, li, delta){
+                let prevScore = parseInt(li.getAttribute('data-score') || '0', 10);
+                let newScore = prevScore + delta;
+
+                console.log(li.getAttribute('data-score'), prevScore, newScore, delta);  
+
+                if (newScore < 0) return; // prevent negative score
+
+                fetch('/api/update-score/' + id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({points: newScore })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    changeScore(li, delta); // update UI
+                    console.log('Score updated:', data);
+                })
+                .catch(error => {
+                    console.error('Error updating score:', error);
+                });
+            }
+
+            // Change score for a player node by delta, clamp at 0
+            function changeScore(li, delta){
+                const cur = parseInt(li.getAttribute('data-score') || '0', 10);
+                let next = cur + delta;
+                if(next < 0) next = 0; // clamp
+                li.setAttribute('data-score', String(next));
+                const span = li.querySelector('.player-score');
+                if(span) span.textContent = String(next);
+            }
+
+            function deletePlayer(id, li){
+                if(!confirm('Are you sure you want to delete this player? This action cannot be undone.')) return;
+
+                fetch('/api/delete-player/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Player deleted:', data);
+                    // Remove from UI
+                    li.remove();
+                })
+                .catch(error => {
+                    console.error('Error deleting player:', error);
+                });
+            }   
+
+            addBtn.addEventListener('click', ()=>{
+                createInputRow();
+            });
+
+            // Allow Enter to submit when focusing an input that's dynamically added
+            document.addEventListener('keydown', (e)=>{
+                if(e.key === 'Enter'){
+                    const active = document.activeElement;
+                    if(active && active.tagName === 'INPUT' && active.type === 'text'){
+                        // find the submit button in the same row
+                        const row = active.closest('.player-row');
+                        if(row){
+                            const btn = row.querySelector('button');
+                            if(btn) btn.click();
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

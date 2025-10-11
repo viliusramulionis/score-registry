@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="lt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Šlagerina — Lietuviškos muzikos viktorina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hepta+Slab:wght@1..900&family=Roboto+Slab:wght@100..900&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', Arial, Helvetica
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: url(/static/bg-noise.png) no-repeat center center;
+            background-size: cover;
+            font-family: "Zilla Slab", serif;
+        } 
+
+        .wrap {
+            max-width: 1024px;
+            margin: 28px auto;
+            padding: 0 16px
+        }
+
+        h1 {
+            font-family: "Hepta Slab", serif;
+            font-size: 80px;
+            font-weight: 800;
+            color: #d42f2f;
+            text-transform: uppercase;
+            margin: 0 0 12px;
+            text-shadow: 4px 4px 0 #ecc3c3;
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: black;
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        .players p {
+            text-align: center;
+            font-size: 24px;
+            width: 100%;
+            margin: 0;
+        }
+
+        .players {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+            margin-top: 25px;
+        }
+
+        .player {
+            width: 200px;
+        }
+
+        .col-heading {
+            background: #000000;
+            color: white;
+            padding: 10px 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .cell {
+            appearance: none;
+            -webkit-appearance: none;
+            border: 1px solid #ddd;
+            background: white;
+            padding: 0;
+            margin: 0;
+            height: 96px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform .06s, opacity .12s;
+            width: 100%;
+            font-size: 34px;
+            font-family: "Hepta Slab", serif;
+            font-weight: 800;
+        }
+
+        .cell:active {
+            transform: scale(.995)
+        }
+
+        .cell.disabled {
+            background: #f0f0f3;
+            color: #888;
+            border-color: #e0e0e6;
+            cursor: default;
+            opacity: .85
+        }
+
+        .qr {
+            position: absolute;
+            top: 35px;
+            right: 35px;
+        }
+
+        @media (max-width:520px) {
+            .cell {
+                height: 68px;
+                font-size: 14px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap">
+        <div class="qr">
+            <img src="/static/qr-code.png" alt="" width="150">
+        </div>
+        <h1>Šlagerina</h1>
+        <h2>Lietuviškos muzikos viktorina</h2>
+
+        <div id="players" class="players" aria-hidden="false">
+            <!-- column headings will be inserted here -->
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            const playersContainer = document.getElementById('players');
+
+            fetch('/api/players')
+                .then(response => response.json())
+                .then(data => {
+                    renderGrid(data);
+                });
+
+
+            function renderGrid(players) {
+                playersContainer.innerHTML = '';
+
+                if (!players || players.length === 0) {
+                    playersContainer.innerHTML = '<p>Registruojami žaidėjai...</p>';
+                    return;
+                }
+
+                players.forEach((n, ci) => {
+                    const playerEl = document.createElement('div');
+                    playerEl.className = 'player';
+
+                    const el = document.createElement('div');
+                    el.className = 'col-heading';
+                    el.textContent = n.name;
+                    el.setAttribute('data-col', ci + 1);
+                    playerEl.appendChild(el);
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'cell';
+                    btn.title = `Row ${1} — Column ${ci + 1}`;
+                    btn.textContent = n.points;
+
+                    // btn.addEventListener('click', function onClick(e){
+                    //     // disable future clicks
+                    //     btn.disabled = true;
+                    //     btn.classList.add('disabled');
+                    //     // show a simple mark to indicate it's been clicked
+                    //     btn.textContent = '✓';
+                    //     // remove listener to be explicit
+                    //     btn.removeEventListener('click', onClick);
+                    // });
+
+                    playerEl.appendChild(btn);
+
+                    playersContainer.appendChild(playerEl);
+                });
+            }
+
+            const ws = new WebSocket('ws://localhost:3000/updates');
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('New counter value:', data);
+
+                renderGrid(data.players);
+            };
+
+
+        })();
+    </script>
+</body>
+
+</html>
