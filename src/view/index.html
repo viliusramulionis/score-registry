@@ -196,8 +196,8 @@
                     playersContainer.appendChild(playerEl);
                 });
             }
-
-            const ws = new WebSocket('ws://localhost:3000/updates');
+            
+            const ws = new WebSocket(`ws://${window.location.href.split('://')[1]}updates`);
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);

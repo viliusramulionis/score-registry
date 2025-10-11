@@ -92,5 +92,5 @@ app.delete('/api/delete-player/:id', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on https://${process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost:' + PORT}`);
 });
