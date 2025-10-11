@@ -1,5 +1,8 @@
 import express from 'express';
 import expressWs from 'express-ws';
+import 'dotenv/config'
+
+console.log(process.env);
 
 const app = express();
 expressWs(app);
