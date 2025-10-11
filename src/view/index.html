@@ -197,7 +197,7 @@
                 });
             }
             
-            const ws = new WebSocket(`ws://${window.location.href.split('://')[1]}updates`);
+            const ws = new WebSocket(`wss://${window.location.href.split('://')[1]}updates`);
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
