@@ -9,8 +9,8 @@ expressWs(app);
 const PORT = process.env.PORT || 3000;
 const clients = new Set();
 
-const pushToClients = (data) => {
-  const message = JSON.stringify(data); 
+const pushToClients = (type, data) => {
+  const message = JSON.stringify({ type, data });
   clients.forEach((client) => {
     if (client.readyState === 1) { // 1 means OPEN
       client.send(message);
@@ -38,7 +38,6 @@ app.ws('/updates', (ws, req) => {
 });
 
 app.get('/', (req, res) => {
-  console.log(process.env)
   res.sendFile(path.resolve('./src/view/index.html'));
 });
 
@@ -56,7 +55,7 @@ app.post('/api/add-players', (req, res) => {
     players.push({ id: players.length + 1, name: data.name, points: 0 });
     res.status(200).json({ message: 'Player added', player: players[players.length - 1] });
 
-    pushToClients({ players });
+    pushToClients('players', players);
   } else {
     res.status(400).json({ message: 'Invalid player data' });
   }
@@ -70,7 +69,7 @@ app.put('/api/update-score/:id', (req, res) => {
     player.points = points;
     res.status(200).json({ message: 'Player score updated', player });
 
-    pushToClients({ players });
+    pushToClients('players', players);
   } else {
     res.status(404).json({ message: 'Player not found' });
   }
@@ -85,10 +84,20 @@ app.delete('/api/delete-player/:id', (req, res) => {
     const deletedPlayer = players.splice(index, 1);
     res.status(200).json({ message: 'Player deleted', player: deletedPlayer[0] });
 
-    pushToClients({ players }); 
+    pushToClients('players', players);
   } else {
     res.status(404).json({ message: 'Player not found' });
   } 
+});
+
+app.post('/api/start-timer', (req, res) => {
+  pushToClients('timer-start', {});
+  res.status(200).json({ message: 'Timer started' });
+});
+
+app.post('/api/remove-timer', (req, res) => {
+  pushToClients('timer-remove', {});
+  res.status(200).json({ message: 'Timer removed' });
 });
 
 app.listen(PORT, () => {

@@ -6,9 +6,9 @@
     <title>Šlagerina — Admin</title>
     <style>
         body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial;margin:22px}
-        main {max-width:600px;margin:0 auto}
-        .controls{display:flex;gap:12px;align-items:center;margin-bottom:14px}
-        .player-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+        main {max-width:900px;margin:0 auto}
+        .controls{display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+        .player-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
         input[type="text"]{padding:8px;border:1px solid #ccc;border-radius:6px}
         button{padding:8px 10px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer}
         ul.players{margin-top:12px;padding:0;list-style:none}
@@ -22,6 +22,26 @@
         .player-actions button{padding:6px 8px;font-size:13px}
         .btn-deduct{background:#fff;border-color:#f1c0c0}
         .btn-add{background:#fff;border-color:#c6f1c8}
+
+        /* Responsive adjustments */
+        @media (max-width:720px){
+            main{padding:0 12px}
+            /* stack the whole card but keep name+score on one row */
+            .player-item{flex-direction:column;align-items:stretch;gap:8px}
+            .player-meta{display:flex;flex-direction:row;justify-content:space-between;align-items:center;width:100%}
+            .player-score{order:0}
+            .player-actions{justify-content:flex-end;width:100%;gap:6px;flex-wrap:wrap}
+            .player-actions button{flex:1 1 auto;padding:10px;border-radius:6px}
+        }
+
+        @media (max-width:420px){
+            /* keep name and score aligned horizontally on very small screens */
+            .player-meta{flex-direction:row;align-items:center;gap:8px}
+            .player-score{min-width:48px;padding:6px 10px}
+            .player-actions button{font-size:15px}
+            .controls{gap:8px}
+            .player-row{gap:6px}
+        }
     </style>
 </head>
 <body>
@@ -30,6 +50,8 @@
 
         <div class="controls">
             <button id="addPlayerBtn" type="button">Add player</button>
+            <button id="startTimerBtn" type="button">Start Timer</button>
+            <button id="removeTimerBtn" type="button">Remove Timer</button>
             <div id="inputs" aria-live="polite"></div>
         </div>
 
@@ -43,6 +65,8 @@
             const addBtn = document.getElementById('addPlayerBtn');
             const inputs = document.getElementById('inputs');
             const playersList = document.getElementById('playersList');
+            const startTimerBtn = document.getElementById('startTimerBtn');
+            const removeTimerBtn = document.getElementById('removeTimerBtn');
             let playerCounter = 0;
 
             fetch('/api/players')
@@ -221,6 +245,28 @@
 
             addBtn.addEventListener('click', ()=>{
                 createInputRow();
+            });
+
+            startTimerBtn.addEventListener('click', ()=>{
+                fetch('/api/start-timer', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Timer started:', data);
+                })
+                .catch(error => {
+                    console.error('Error starting timer:', error);
+                });
+            });
+
+            removeTimerBtn.addEventListener('click', ()=>{
+                fetch('/api/remove-timer', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Timer removed:', data);
+                })
+                .catch(error => {
+                    console.error('Error removing timer:', error);
+                });
             });
 
             // Allow Enter to submit when focusing an input that's dynamically added

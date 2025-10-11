@@ -124,6 +124,20 @@
             right: 35px;
         }
 
+        .timer {
+            display: none;
+            position: absolute;
+            background-color: black;
+            color: white;
+            top: 30px;
+            left: 30px;
+            font-size: 130px;
+            padding: 10px 0 20px;
+            font-weight: 800;
+            width: 270px;
+            text-align: center;
+        }
+
         @media (max-width:520px) {
             .cell {
                 height: 68px;
@@ -138,6 +152,7 @@
         <div class="qr">
             <img src="/static/qr-code.png" alt="" width="150">
         </div>
+        <div class="timer"></div>
         <h1>Šlagerina</h1>
         <h2>Lietuviškos muzikos viktorina</h2>
 
@@ -149,6 +164,8 @@
     <script>
         (function () {
             const playersContainer = document.getElementById('players');
+            const timerEl = document.querySelector('.timer');
+            let timer;
 
             fetch('/api/players')
                 .then(response => response.json())
@@ -196,14 +213,49 @@
                     playersContainer.appendChild(playerEl);
                 });
             }
+
+            function createTimer() {
+                timerEl.textContent = '30';
+                timerEl.style.display = 'block';
+
+                timer = setInterval(() => {
+                    let seconds = parseInt(timerEl.textContent);
+                    seconds--;
+
+                    if (isNaN(seconds) || seconds <= 0) {
+                        clearInterval(timer);
+                        timerEl.textContent = '00';
+                        return;
+                    }
+
+                    timerEl.textContent = `${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            function removeTimer() {
+                timerEl.style.display = 'none';
+                timerEl.textContent = '';
+
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
             
             const ws = new WebSocket(`wss://${window.location.href.split('://')[1]}updates`);
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 console.log('New counter value:', data);
-
-                renderGrid(data.players);
+                if (data.type === 'timer-start') {
+                    // handle timer start if needed
+                    createTimer();
+                } else if (data.type === 'timer-remove') {
+                    // handle timer stop if needed
+                    removeTimer();
+                } else {
+                    renderGrid(data.data);
+                }
             };
 
 
