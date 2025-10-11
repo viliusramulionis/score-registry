@@ -38,6 +38,7 @@ app.ws('/updates', (ws, req) => {
 });
 
 app.get('/', (req, res) => {
+  console.log(process.env)
   res.sendFile(path.resolve('./src/view/index.html'));
 });
 
