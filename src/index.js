@@ -1,8 +1,8 @@
 import express from 'express';
 import expressWs from 'express-ws';
+import path from 'path';
 import 'dotenv/config'
 
-console.log(process.env);
 
 const app = express();
 expressWs(app);
@@ -38,11 +38,11 @@ app.ws('/updates', (ws, req) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile('./src/view/index.html', { root: process.cwd() });
+  res.sendFile(path.resolve('./src/view/index.html'));
 });
 
 app.get('/admin', (req, res) => {
-  res.sendFile('./src/view/admin.html', { root: process.cwd() });
+  res.sendFile(path.resolve('./src/view/admin.html'));
 });
 
 app.get('/api/players', (req, res) => {
