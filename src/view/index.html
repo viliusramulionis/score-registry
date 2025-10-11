@@ -218,6 +218,10 @@
                 timerEl.textContent = '30';
                 timerEl.style.display = 'block';
 
+                if (timer) {
+                    clearInterval(timer);
+                }
+
                 timer = setInterval(() => {
                     let seconds = parseInt(timerEl.textContent);
                     seconds--;
