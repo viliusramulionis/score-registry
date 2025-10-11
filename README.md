@@ -8,8 +8,5 @@ Creates two page solution for a screen which is displayed for players and separa
 
 ```bash
   npm install
-```
-
-```bash
   npm start
 ```
