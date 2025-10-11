@@ -6,7 +6,10 @@ Creates two page solution for a screen which is displayed for players and separa
 
 ## Usage
 
-```http
+```bash
   npm install
+```
+
+```bash
   npm start
 ```
