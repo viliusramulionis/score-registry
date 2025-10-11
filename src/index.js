@@ -22,7 +22,7 @@ const players = [];
 
 app.use(express.json());
 
-app.use('/static', express.static('./src/assets/images'));
+app.use('/static', express.static(path.resolve('./src/assets/images')));
 
 app.ws('/updates', (ws, req) => {
   console.log('Client connected');
