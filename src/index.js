@@ -29,7 +29,7 @@ app.ws('/updates', (ws, req) => {
   clients.add(ws);
 
   // Send initial value
-  ws.send(JSON.stringify({ players }));
+  ws.send(JSON.stringify({ data: players }));
 
   ws.on('close', () => {
     console.log('Client disconnected');
