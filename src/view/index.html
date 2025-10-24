@@ -178,7 +178,7 @@
                 playersContainer.innerHTML = '';
 
                 if (!players || players.length === 0) {
-                    playersContainer.innerHTML = '<p>Registruojami žaidėjai...</p>';
+                    playersContainer.innerHTML = '<p>Pradėsime netrukus...</p>';
                     return;
                 }
 
@@ -246,22 +246,31 @@
                 }
             }
             
-            const ws = new WebSocket(`wss://${window.location.href.split('://')[1]}updates`);
 
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                console.log('New counter value:', data);
-                if (data.type === 'timer-start') {
-                    // handle timer start if needed
-                    createTimer();
-                } else if (data.type === 'timer-remove') {
-                    // handle timer stop if needed
-                    removeTimer();
-                } else {
-                    renderGrid(data.data);
-                }
+            function setupWEbsocket() {
+                const ws = new WebSocket(`wss://${window.location.href.split('://')[1]}updates`);
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    console.log('New counter value:', data);
+                    if (data.type === 'timer-start') {
+                        // handle timer start if needed
+                        createTimer();
+                    } else if (data.type === 'timer-remove') {
+                        // handle timer stop if needed
+                        removeTimer();
+                    } else {
+                        renderGrid(data.data);
+                    }
+                };
+
+                ws.onclose = () => {
+                    console.log('WebSocket connection closed');
+                    setupWEbsocket();
+                };
             };
 
+            setupWEbsocket();
 
         })();
     </script>
