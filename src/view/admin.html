@@ -52,6 +52,7 @@
             <button id="addPlayerBtn" type="button">Add player</button>
             <button id="startTimerBtn" type="button">Start Timer</button>
             <button id="removeTimerBtn" type="button">Remove Timer</button>
+            <button id="nextTeamBtn" type="button">Next Team</button>
             <div id="inputs" aria-live="polite"></div>
         </div>
 
@@ -67,7 +68,9 @@
             const playersList = document.getElementById('playersList');
             const startTimerBtn = document.getElementById('startTimerBtn');
             const removeTimerBtn = document.getElementById('removeTimerBtn');
+            const nextTeamBtn = document.getElementById('nextTeamBtn');
             let playerCounter = 0;
+            let currentTeam = 0;
 
             fetch('/api/players')
             .then(response => response.json())
@@ -267,6 +270,21 @@
                 .catch(error => {
                     console.error('Error removing timer:', error);
                 });
+            });
+
+            nextTeamBtn.addEventListener('click', ()=>{
+                if(currentTeam === playersList.children.length - 1){
+                    currentTeam = 0;
+                } else {
+                    currentTeam += 1;
+                }
+                playersList.childNodes.forEach((li, index)=>{
+                    if(index === currentTeam){
+                        li.style.backgroundColor = '#e0f7fa';
+                    } else {
+                        li.style.backgroundColor = '';
+                    }
+                }); 
             });
 
             // Allow Enter to submit when focusing an input that's dynamically added
