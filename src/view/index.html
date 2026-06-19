@@ -16,7 +16,7 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', Arial, Helvetica
         }
 
-        body::before {
+        /* body::before {
             content: "";
             position: fixed;
             top: 0;
@@ -25,7 +25,7 @@
             height: 150px;
             background: url(/static/top_bg.png) no-repeat bottom center / cover;
             z-index: -1;
-        }
+        } */
 
         body {
             display: flex;
@@ -34,7 +34,7 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: #fdf800 url(/static/bg_new.png) no-repeat center center fixed;
+            background: #000 url(/static/bg-eurovision.png) no-repeat center center fixed;
             background-size: cover;
             font-family: "Zilla Slab", serif;
         } 
@@ -49,10 +49,10 @@
             font-family: "Hepta Slab", serif;
             font-size: 80px;
             font-weight: 800;
-            color: #000000;
+            color: #FFF;
             text-transform: uppercase;
             margin: 0 0 12px;
-            text-shadow: 4px 4px 0 #d7d000;
+            /* text-shadow: 4px 4px 0 #FFF; */
             text-align: center;
         }
 
@@ -64,7 +64,7 @@
             text-align: center;
             margin-bottom: 0;
             background-color: black;
-            color: #fdf800;
+            color: #f30095;
             width: fit-content;
             padding: 5px 15px;
             margin: 0 auto;
@@ -93,7 +93,7 @@
         }
 
         .col-heading {
-            background: #000000;
+            background: #ff00a2;
             color: white;
             padding: 10px 8px;
             text-align: center;
@@ -105,8 +105,8 @@
         .cell {
             appearance: none;
             -webkit-appearance: none;
-            background: #000000;
-            color: #fdf800;
+            background: #262626;
+            color: #ff00a2;
             border: none;
             padding: 0;
             margin: 0;
@@ -171,8 +171,8 @@
             <!-- <img src="/static/qr-code.png" alt="" width="150"> -->
         <!-- </div> -->
         <div class="timer"></div>
-        <h1>Šlagerina</h1>
-        <h2>Protų susirėmimas</h2>
+        <h1>Eurovizijos</h1>
+        <h2>Belaukiant</h2>
 
         <div id="players" class="players" aria-hidden="false">
             <!-- column headings will be inserted here -->
