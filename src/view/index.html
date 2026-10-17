@@ -16,7 +16,7 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', Arial, Helvetica
         }
 
-        body::before {
+        /* body::before {
             content: "";
             position: fixed;
             top: 0;
@@ -25,7 +25,7 @@
             height: 150px;
             background: url(/static/top_bg.png) no-repeat bottom center / cover;
             z-index: -1;
-        }
+        } */
 
         body {
             display: flex;
@@ -34,10 +34,10 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: #fdf800 url(/static/bg_new.png) no-repeat center center fixed;
+            background: #90ee33 url(/static/bg_azuolynas.png) no-repeat center center fixed;
             background-size: cover;
             font-family: "Zilla Slab", serif;
-        } 
+        }
 
         .wrap {
             max-width: 1024px;
@@ -45,15 +45,52 @@
             padding: 0 16px
         }
 
+        .title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
         h1 {
             font-family: "Hepta Slab", serif;
             font-size: 80px;
             font-weight: 800;
-            color: #000000;
+            color: white;
             text-transform: uppercase;
             margin: 0 0 12px;
-            text-shadow: 4px 4px 0 #d7d000;
+            text-shadow: 23px 4px 0px #000000;
             text-align: center;
+            position: relative;
+            width: fit-content;
+        }
+
+        h1::before,
+        h1::after {
+            content: "Šlagerina";
+            font-family: "Hepta Slab", serif;
+            font-size: 80px;
+            font-weight: 800;
+            color: black;
+            text-transform: uppercase;
+            margin: 0 0 12px;
+            text-align: center;
+            position: absolute;
+            left: 0;
+            z-index: -1;
+        }
+
+        h1::before {
+            top: -21px;
+            left: -17px;
+            text-shadow: -20px 17px 0 #000000;
+        }
+
+        h1::after {
+            top: 21px;
+            left: 17px;
+            text-shadow: -16px 14px 0px #000000'
+
         }
 
         h2 {
@@ -64,7 +101,7 @@
             text-align: center;
             margin-bottom: 0;
             background-color: black;
-            color: #fdf800;
+            color: #f3a326;
             width: fit-content;
             padding: 5px 15px;
             margin: 0 auto;
@@ -106,7 +143,7 @@
             appearance: none;
             -webkit-appearance: none;
             background: #000000;
-            color: #fdf800;
+            color: #90ee33;
             border: none;
             padding: 0;
             margin: 0;
@@ -168,14 +205,39 @@
     <!-- One update -->
     <main class="wrap">
         <!-- <div class="qr"> -->
-            <!-- <img src="/static/qr-code.png" alt="" width="150"> -->
+        <!-- <img src="/static/qr-code.png" alt="" width="150"> -->
         <!-- </div> -->
         <div class="timer"></div>
-        <h1>Šlagerina</h1>
+        <div class="title">
+            <h1>Šlagerina</h1>
+        </div>
         <h2>Protų susirėmimas</h2>
-
+        <!-- Temp -->
         <div id="players" class="players" aria-hidden="false">
-            <!-- column headings will be inserted here -->
+            <div class="player">
+                <div class="col-heading" data-col="1">awdawdaw</div><button type="button" class="cell"
+                    title="Row 1 — Column 1">0</button>
+            </div>
+            <div class="player">
+                <div class="col-heading" data-col="2">awdawdaw</div><button type="button" class="cell"
+                    title="Row 1 — Column 2">0</button>
+            </div>
+            <div class="player">
+                <div class="col-heading" data-col="3">awdawdawd</div><button type="button" class="cell"
+                    title="Row 1 — Column 3">0</button>
+            </div>
+            <div class="player">
+                <div class="col-heading" data-col="4">awdawdaw</div><button type="button" class="cell"
+                    title="Row 1 — Column 4">0</button>
+            </div>
+            <div class="player">
+                <div class="col-heading" data-col="4">Labai ilgas komandos pavadinimas</div><button type="button" class="cell"
+                    title="Row 1 — Column 4">0</button>
+            </div>
+            <div class="player">
+                <div class="col-heading" data-col="4">awdawdaw</div><button type="button" class="cell"
+                    title="Row 1 — Column 4">0</button>
+            </div>
         </div>
     </main>
 
@@ -193,10 +255,10 @@
 
 
             function renderGrid(players) {
-                playersContainer.innerHTML = '';
+                // playersContainer.innerHTML = '';
 
                 if (!players || players.length === 0) {
-                    playersContainer.innerHTML = '<p>Pradėsime netrukus...</p>';
+                    // playersContainer.innerHTML = '<p>Pradėsime netrukus...</p>';
                     return;
                 }
 
@@ -263,7 +325,7 @@
                     timer = null;
                 }
             }
-            
+
 
             function setupWEbsocket() {
                 const ws = new WebSocket(`wss://${window.location.href.split('://')[1]}updates`);
